@@ -66,6 +66,9 @@ export async function POST(request: Request) {
   try {
     const id = crypto.randomUUID();
     const d1 = env.DB;
+    if (!d1) {
+      return NextResponse.json({ ok: true, requestId: id, stored: false }, { status: 201, headers: { "Cache-Control": "no-store" } });
+    }
     await d1.batch([
       d1.prepare(`CREATE TABLE IF NOT EXISTS requests (
         id TEXT PRIMARY KEY NOT NULL,

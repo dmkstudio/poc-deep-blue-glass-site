@@ -1,5 +1,6 @@
 import vinext from "vinext";
 import { defineConfig } from "vite";
+import { nitro } from "nitro/vite";
 import hostingConfig from "./.openai/hosting.json" with { type: "json" };
 import { sites } from "./build/sites-vite-plugin.ts";
 
@@ -42,6 +43,10 @@ export default defineConfig(async () => {
 
   // Wrangler snapshots its log path while the Cloudflare plugin is imported.
   const { cloudflare } = await import("@cloudflare/vite-plugin");
+
+  if (process.env.VERCEL || process.env.NITRO_PRESET === "vercel") {
+    return { resolve: { alias: { "cloudflare:workers": "./vercel/cloudflare-workers-stub.ts" } }, plugins: [vinext(), nitro({ preset: "vercel" })] };
+  }
 
   return {
     server: isCodexSeatbeltSandbox
