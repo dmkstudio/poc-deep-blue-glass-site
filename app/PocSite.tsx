@@ -10,6 +10,7 @@ import { copy, directionKeys, pillars, type DirectionKey, type Locale } from "./
 
 const languages: Locale[] = ["en", "fr", "ru"];
 const icons = { business: Building2, property: Landmark, relocation: Sparkles, mobility: CarFront, brand: UserRound };
+const contactLinks = [{ name: "Instagram", Icon: Camera }, { name: "Telegram", Icon: Send }, { name: "Email", Icon: Mail }, { name: "Call", Icon: Phone }];
 
 function Brand({ compact = false }: { compact?: boolean }) {
   return <a className="brand" href="#home" aria-label="POC — Private Office Consulting, home">
@@ -40,6 +41,14 @@ export default function PocSite() {
     return () => window.clearTimeout(timer);
   }, []);
 
+  useEffect(() => {
+    if (!menuOpen) return;
+    const close = (event: KeyboardEvent) => { if (event.key === "Escape") setMenuOpen(false); };
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", close);
+    return () => { document.body.style.overflow = ""; window.removeEventListener("keydown", close); };
+  }, [menuOpen]);
+
   function setLocale(v: Locale) { setLocaleState(v); localStorage.setItem("poc-locale", v); document.documentElement.lang = v; }
   function selectDirection(key: DirectionKey) { setActive(key); setTimeout(() => document.getElementById("contact")?.scrollIntoView({ behavior: reduce ? "auto" : "smooth" }), 120); }
 
@@ -49,13 +58,13 @@ export default function PocSite() {
     <header className="topbar">
       <Brand />
       <nav className="desktop-nav" aria-label="Primary navigation">
-        <a href="#home">Home</a><a href="#approach">{t.nav.approach}</a><a href="#services">{t.nav.expertise}</a><a href="#confidentiality">{t.nav.confidentiality}</a><a href="#contact">{t.nav.contact}</a>
+        <a href="#home">POC</a><a href="#approach">{t.nav.approach}</a><a href="#services">{t.nav.expertise}</a><a href="#confidentiality">{t.nav.confidentiality}</a><a href="#contact">{t.nav.contact}</a>
       </nav>
       <LanguageSwitch locale={locale} setLocale={setLocale} />
       <button className="menu-toggle" onClick={() => setMenuOpen(v => !v)} aria-expanded={menuOpen} aria-label={menuOpen ? t.nav.menuClose : t.nav.menuOpen}>{menuOpen ? <X /> : <Menu />}</button>
     </header>
     <AnimatePresence>{menuOpen && <motion.nav className="mobile-nav" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} aria-label="Mobile navigation">
-      {[ ["#home", "Home"], ["#approach", t.nav.approach], ["#services", t.nav.expertise], ["#confidentiality", t.nav.confidentiality], ["#contact", t.nav.contact] ].map(([href, label]) => <a key={href} href={href} onClick={() => setMenuOpen(false)}>{label}</a>)}
+      {[ ["#home", "POC"], ["#approach", t.nav.approach], ["#services", t.nav.expertise], ["#confidentiality", t.nav.confidentiality], ["#contact", t.nav.contact] ].map(([href, label]) => <a key={href} href={href} onClick={() => setMenuOpen(false)}>{label}</a>)}
       <div className="mobile-languages">{languages.map(l => <button key={l} onClick={() => setLocale(l)} className={locale === l ? "active" : ""}>{l.toUpperCase()}</button>)}</div>
     </motion.nav>}</AnimatePresence>
 
@@ -68,11 +77,11 @@ export default function PocSite() {
           <h1>{t.hero.title}</h1>
           <a className="text-cta" href="#services">{t.hero.secondary}<ArrowDown /></a>
         </motion.div>
-        <motion.div className="hero-marker" animate={reduce ? {} : { opacity: [.35, 1, .35], y: [0, 8, 0] }} transition={{ duration: 2.4, repeat: Infinity }}><span>Scroll</span><ArrowDown /></motion.div>
+        <motion.div className="hero-marker" animate={reduce ? {} : { opacity: [.35, 1, .35], y: [0, 8, 0] }} transition={{ duration: 2.4, repeat: Infinity }}><span>{t.hero.scroll}</span><ArrowDown /></motion.div>
       </section>
 
       <section className="intro" id="approach">
-        <Reveal><p className="kicker">{t.positioning.label}</p><h2>Five fields.<br />One standard of execution.</h2><span className="gold-line center" /></Reveal>
+        <Reveal><p className="kicker">{t.positioning.label}</p><h2>{t.positioning.title}</h2><span className="gold-line center" /></Reveal>
         <Reveal className="approach-copy"><p>{t.positioning.paragraphs[0]}</p><p>{t.positioning.paragraphs[1]}</p></Reveal>
         <div className="assurances">{t.positioning.assurances.map((item, index) => <Reveal key={item} className="assurance"><span>0{index + 1}</span><p>{item}</p></Reveal>)}</div>
       </section>
@@ -119,8 +128,7 @@ function Reveal({ children, className = "" }: { children: React.ReactNode; class
 }
 
 function ContactLinks({ label, compact = false }: { label: string; compact?: boolean }) {
-  const links = [{ name: "Instagram", Icon: Camera }, { name: "Telegram", Icon: Send }, { name: "Email", Icon: Mail }, { name: "Call", Icon: Phone }];
-  return <div className={`contact-links ${compact ? "compact" : ""}`}>{links.map(({ name, Icon }) => <button type="button" key={name} title={label} aria-label={`${name}. ${label}`}><Icon /><span>{compact ? "" : name}</span></button>)}</div>;
+  return <div className={`contact-links ${compact ? "compact" : ""}`}>{contactLinks.map(({ name, Icon }) => <a key={name} href="#contact" title={label} aria-label={`${name}. ${label}`}><Icon /><span>{compact ? "" : name}</span></a>)}</div>;
 }
 
 function RequestForm({ locale, initialDirection }: { locale: Locale; initialDirection: DirectionKey | null }) {
