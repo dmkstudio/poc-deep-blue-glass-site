@@ -73,7 +73,7 @@ export default function PocSite() {
         <motion.div className="hero-image" initial={{ scale: 1.08 }} animate={{ scale: 1 }} transition={{ duration: 1.8 }} />
         <div className="hero-vignette" />
         <motion.div className="hero-copy" initial={{ opacity: 0, y: 36 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: .15 }}>
-          <p className="hero-monogram">POC</p><span className="gold-line" />
+          <p className="hero-context">{t.hero.eyebrow}</p><span className="gold-line" />
           <h1>{t.hero.title}</h1>
           <a className="text-cta" href="#services">{t.hero.secondary}<ArrowDown /></a>
         </motion.div>
